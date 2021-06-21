@@ -1,0 +1,5 @@
+#REMOVE Live Server settings
+.vscode/settings.json
+#REMOVE images - can be find in the EloquentJS github repo
+img/
+
