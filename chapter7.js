@@ -166,26 +166,36 @@ var roads = [
         return this;
       } else {
         let parcels = this.parcels.map(p => {
-          if (p.place != this.place) return p;
-          return {place: destination, address: p.address};
-        }).filter(p => p.place != p.address);
+          if (p.place != this.place) return p; //la parcel est sur une case non visitée
+          return {place: destination, address: p.address}; //la parcel est sur la case "destination"
+        }).filter(p => p.place != p.address); // Si p.place == p.adress la parcel est arrivé à destination
+        
         return new VillageState(destination, parcels);
       }
     }
   }
   
   function runRobot(state, robot, memory) {
-    for (let turn = 0;; turn++) {
+    let turn
+    for (turn = 0;; turn++) {
       if (state.parcels.length == 0) {
-        console.log(`Done in ${turn} turns`);
+        // console.log(`Done in ${turn} turns`);
         break;
       }
-      let action = robot(state, memory);
-      state = state.move(action.direction);
-      memory = action.memory;
-      console.log(`Moved to ${action.direction}`);
+
+      let Robot = robot(state, memory); 
+      state = state.move(Robot.direction);
+      memory = Robot.memory;
+
+      //console.log(`Moved to ${Robot.direction}`);
+
     }
+
+    return turn
   }
+
+ 
+
   
   function randomPick(array) {
     let choice = Math.floor(Math.random() * array.length);
@@ -253,12 +263,43 @@ var roads = [
 
 
 
-runRobotAnimation(VillageState.random(),
-                  goalOrientedRobot, []);
+// runRobotAnimation(VillageState.random(),
+//                   goalOrientedRobot, []);
+
+let test = runRobot(VillageState.random(),goalOrientedRobot,[])
 
 
+function compareRobots(robot1, memory1, robot2, memory2) {
+  
+  let ROBOTS = {
+    robot1 : {
+      name: "robot 1",
+      resultat : []
+    },
+    robot2 : {
+      name: "robot 2",
+      resultat : []
+    } 
+  }
 
+  for(let i=0;i<100;i++){
+    let testState = VillageState.random()
+    ROBOTS.robot1.resultat.push(runRobot(testState,goalOrientedRobot,[]))
+    ROBOTS.robot2.resultat.push(runRobot(testState,routeRobot,[]))
+  
+  }
 
+  function moyenne(robot){
+    let res = robot.resultat.reduce((a,b) => { return a+b }) / robot.resultat.length
+    console.log(robot.name + " : " + res + "%")
+  }
+
+  moyenne(ROBOTS.robot1)
+  moyenne(ROBOTS.robot2)
+  
+}
+
+compareRobots(routeRobot, [], goalOrientedRobot, []);
 
 
 
