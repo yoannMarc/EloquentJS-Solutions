@@ -269,8 +269,8 @@ var roads = [
 
 
 
-runRobotAnimation(VillageState.random(),
-  myRobot, []);
+// runRobotAnimation(VillageState.random(),
+//   myRobot, []);
 
 
 
@@ -342,8 +342,74 @@ function myRobot({place, parcels},route) {
 
 }
 
+
+//improvement after eloquentJS solution
+// => one variable
+
+ function myRobotv2({place, parcels},route) {
+
+      
+   if (route.length == 0) {
+     
+    
+     // SAME AS MAP
+     let routes = []
+     for (let parcel of parcels) {
+         if (parcel.place != place) routes.push({route : findRoute(roadGraph,place,parcel.place), pickUp : true })
+         else routes.push({route : findRoute(roadGraph,place,parcel.address), pickUp: false})
+     }
+
+     function score({route, pickUp}) {
+       return ((pickUp ? -0.5 : 0) + route.length)
+     }
+    
+     route = routes.reduce((a,b)=> { return (score(a) < score(b) ? a : b)}).route
+
+   }
+
+   return {direction: route[0], memory: route.slice(1)};
+
+ }
+
+
+// ELOQUENT JS SOLUTION
+
+function lazyRobot({place, parcels}, route) {
+  if (route.length == 0) {
+    // Describe a route for every parcel
+    let routes = parcels.map(parcel => {
+      if (parcel.place != place) {
+        return {route: findRoute(roadGraph, place, parcel.place),
+                pickUp: true};
+      } else {
+        return {route: findRoute(roadGraph, place, parcel.address),
+                pickUp: false};
+      }
+    });
+
+    // This determines the precedence a route gets when choosing.
+    // Route length counts negatively, routes that pick up a package
+    // get a small bonus.
+    function score({route, pickUp}) {
+      return (pickUp ? 0.5 : 0) - route.length;
+    }
+    route = routes.reduce((a, b) => score(a) > score(b) ? a : b).route;
+  }
+
+  return {direction: route[0], memory: route.slice(1)};
+}
+
+
+
 console.log("Robot 1 = myRobot || robot 2 = goalOrientedRobot")
 compareRobots(myRobot,[],goalOrientedRobot,[])
+
+console.log("Robot 1 = myRobot || robot 2 = lazyRobot")
+compareRobots(myRobot,[],lazyRobot,[])
+
+console.log("Robot 1 = myRobotv2 || robot 2 = lazyRobot")
+compareRobots(myRobotv2,[],lazyRobot,[])
+
 
 
 
