@@ -167,8 +167,8 @@ var roads = [
       } else {
         let parcels = this.parcels.map(p => {
           if (p.place != this.place) return p; //la parcel est sur une case non visitée
-          return {place: destination, address: p.address}; //la parcel est sur la case "destination"
-        }).filter(p => p.place != p.address); // Si p.place == p.adress la parcel est arrivé à destination
+          return {place: destination, address: p.address}; //la parcel est sur la case en cours
+        }).filter(p => p.place != p.address); // Si p.place == p.adress la parcel est livrée
         
         return new VillageState(destination, parcels);
       }
@@ -228,12 +228,16 @@ var roads = [
     "Marketplace", "Post Office"
   ];
   
+
+
   function routeRobot(state, memory) {
     if (memory.length == 0) {
       memory = mailRoute;
     }
     return {direction: memory[0], memory: memory.slice(1)};
   }
+
+
   
   function findRoute(graph, from, to) {
     let work = [{at: from, route: []}];
@@ -248,7 +252,9 @@ var roads = [
     }
   }
   
-  function goalOrientedRobot({place, parcels}, route) {
+
+
+  function goalOrientedRobot({place, parcels}, route) { //route = memory
     if (route.length == 0) {
       let parcel = parcels[0];
       if (parcel.place != place) {
@@ -263,11 +269,13 @@ var roads = [
 
 
 
-// runRobotAnimation(VillageState.random(),
-//                   goalOrientedRobot, []);
+runRobotAnimation(VillageState.random(),
+  myRobot, []);
 
-let test = runRobot(VillageState.random(),goalOrientedRobot,[])
 
+
+// EXERCISE 1
+// Create a comparative function for robots 
 
 function compareRobots(robot1, memory1, robot2, memory2) {
   
@@ -284,8 +292,8 @@ function compareRobots(robot1, memory1, robot2, memory2) {
 
   for(let i=0;i<100;i++){
     let testState = VillageState.random()
-    ROBOTS.robot1.resultat.push(runRobot(testState,goalOrientedRobot,[]))
-    ROBOTS.robot2.resultat.push(runRobot(testState,routeRobot,[]))
+    ROBOTS.robot1.resultat.push(runRobot(testState,robot1,[]))
+    ROBOTS.robot2.resultat.push(runRobot(testState,robot2,[]))
   
   }
 
@@ -299,8 +307,43 @@ function compareRobots(robot1, memory1, robot2, memory2) {
   
 }
 
+console.log("robot 1 = routeRobot || robot 2 = goalOrientedRobot")
 compareRobots(routeRobot, [], goalOrientedRobot, []);
 
+
+
+// EXERCISE 2
+
+function myRobot({place, parcels},route) {
+
+      
+  if (route.length == 0) {
+    let pickupRoute = []
+    let deliveryRoute = []
+    
+    for (let parcel of parcels) {
+        if (parcel.place != place) pickupRoute.push(findRoute(roadGraph,place,parcel.place))
+        else deliveryRoute.push(findRoute(roadGraph,place,parcel.address))
+    }
+
+    const reducer = (a,b)=> { return ((a.length >= b.length) ? b : a) }
+    let bestPickup = ((pickupRoute.length==0) ? [] : pickupRoute.reduce(reducer))
+    let bestDelivery = ((deliveryRoute.length==0) ? [] : deliveryRoute.reduce(reducer))
+
+    
+    if (bestPickup.length == 0) route = bestDelivery // no parcel to deliver
+    else if (bestDelivery.length == 0) route = bestPickup // no parcel has been pickedup
+    else route = ((bestPickup.length <= bestDelivery.length) ? bestPickup : bestDelivery)
+    
+
+  }
+
+  return {direction: route[0], memory: route.slice(1)};
+
+}
+
+console.log("Robot 1 = myRobot || robot 2 = goalOrientedRobot")
+compareRobots(myRobot,[],goalOrientedRobot,[])
 
 
 
