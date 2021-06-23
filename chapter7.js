@@ -411,6 +411,49 @@ console.log("Robot 1 = myRobotv2 || robot 2 = lazyRobot")
 compareRobots(myRobotv2,[],lazyRobot,[])
 
 
+//EXERCISE 3
+
+class PGroup {
+  constructor(goup){
+    this.group = goup
+   
+  }
+  
+  add(value) {
+      if (this.has(value)) return this
+      return new PGroup(this.group.concat([value]))
+  }
+  
+
+  delete(value) {
+       if (this.has(value)) return new PGroup(this.group.filter(p => p !== value))
+       return this
+         
+       
+  }
+
+  has(value){
+      return this.group.includes(value)
+ 
+  }
+
+
+}
+
+PGroup.empty = new PGroup([])
+
+let a = PGroup.empty.add("a");
+let ab = a.add("b");
+let b = ab.delete("a");
+
+ console.log(b.has("b"));
+ // → true
+ console.log(a.has("b"));
+ // → false
+ console.log(b.has("a"));
+ // → false
+
+
 
 
 
