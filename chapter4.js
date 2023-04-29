@@ -79,7 +79,7 @@ console.log('tab2 = '+tab2)
 
 function arrayToList(tab) {
     let res
-   
+    let i
     for(i=tab.length-1;i>=0;i--) {
          if (res == undefined) res = {value:tab[i], rest: null}
          else res = {value:tab[i], rest: res}
@@ -121,9 +121,9 @@ console.log(nth(arrayToList([10,20,30]),2))
 console.log(nth(arrayToList([10,20,30]),3))
 
 
-
+//veut dire que les keys sont identtiques
 function deepEqual(obj1, obj2) { 
-       
+    let i
     if ((typeof obj1 == "object" && obj1 != null) && (typeof obj2 == "object" && obj2 != null)) {
         const obj1_keys = Object.keys(obj1)    
         const obj2_keys = Object.keys(obj2)
@@ -132,23 +132,25 @@ function deepEqual(obj1, obj2) {
         
 
         for(i=0;i < obj1_keys.length;i++){
+            console.log('key '+obj1_keys[i])
             if (obj1_keys[i] != obj2_keys[i]) return false
             if (!deepEqual(obj1[obj2_keys[i]],obj2[obj2_keys[i]])) return false
 
 
         }
-
-
-    } else {
+    } else
+    {
+        console.log('obj '+obj1)
         return (obj1 === obj2)
+        
     } 
     
     
     return true
 
-    
 
- 
+
+
 }
 
 let object = { here:"here", object:"object", testObject: { test:"test", test2:"test2"} } 
@@ -156,13 +158,13 @@ let object = { here:"here", object:"object", testObject: { test:"test", test2:"t
 
 console.log(deepEqual(
     { here:"here", object:"object", testObject: { test:"test", test2:"test2"} } ,
-    { here:"here", object:"object", testObject: { test:"test", test2:"test3"} } )
-    )
-    let obj = {here: {is: "an"}, object: 2};
-    console.log(deepEqual(obj, obj));
-    // → true
-    console.log(deepEqual(obj, {here: 1, object: 2}));
-    // → false
-    console.log(deepEqual(obj, {here: {is: "an"}, object: 2}));
-    // → true
-
+    { here:"here", object:"object", testObject: { test:"test", test2:"test3"} }))
+let obj = {here: {is: "an"}, object: 2};
+console.log(deepEqual(obj, obj));
+// → true
+console.log(deepEqual(obj, {here: 1, object: 2}));
+// → false
+console.log(deepEqual(obj, {here: {is: "an"}, object: 2}));
+// → true
+console.log(deepEqual(obj,{here: {is: "an"}, object: 2}))
+// -> true
